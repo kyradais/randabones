@@ -1,0 +1,8 @@
+{
+  "name": "randabones",
+  "version": "0.1.0",
+  "description": "Web-based 2D bone animation editor inspired by Spine2D",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "license": "MIT"
+}

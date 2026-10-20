@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Randabones</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="setup">
+<div id="app">
+  <nav id="menubar"><b class="brand">Randabones</b><div id="menus"></div><span class="grow"></span><span class="mut" id="skname">skeleton.json</span></nav>
+
+  <div id="toolbar">
+    <div class="seg" id="modes"><button data-mode="setup" class="on">Setup</button><button data-mode="animate">Animate</button></div>
+    <i class="sep"></i>
+    <div class="grp" id="tools">
+      <button data-tool="select" title="Select (V)">⬉</button>
+      <button data-tool="pan" title="Pan canvas (H)">✋</button>
+      <button data-tool="create" title="Create bone (B)">🦴</button>
+      <button data-tool="translate" title="Translate (T)">✥</button>
+      <button data-tool="rotate" title="Rotate (R)">↻</button>
+      <button data-tool="scale" class="stub" title="Scale (S)">⤢</button>
+      <button data-tool="shear" class="stub" title="Shear (D)">◩</button>
+    </div>
+    <i class="sep"></i>
+    <div class="grp">
+      <button class="stub" data-todo="New slot" title="New slot">▭</button>
+      <button class="stub" data-todo="Region attachment" title="Image / region">🖼</button>
+      <button class="stub" data-todo="Mesh" title="Mesh">⬡</button>
+      <button class="stub" data-todo="Weights" title="Weights">◍</button>
+      <button class="stub" data-todo="IK constraint" title="IK constraint">⛓</button>
+      <button class="stub" data-todo="Path constraint" title="Path">∿</button>
+    </div>
+    <i class="sep"></i>
+    <div class="grp toggles">
+      <button data-show="bones" class="on" title="Show bones">Bone</button>
+      <button data-show="grid" class="on" title="Show grid">Grid</button>
+      <button data-show="axes" class="on" title="Show axes">Axes</button>
+      <button class="stub" data-todo="Show images">Images</button>
+      <button class="stub" data-todo="Show meshes">Mesh</button>
+    </div>
+    <span class="grow"></span>
+    <label class="sel">Skin <select><option>default</option></select></label>
+    <label class="sel">Pose <select><option>Setup</option><option>Animation</option></select></label>
+  </div>
+
+  <aside id="left">
+    <section class="panel" id="treep"><h3>Tree</h3><div id="tree" class="scroll"></div></section>
+    <section class="panel" id="propsp"><h3>Properties</h3><div id="props" class="scroll"></div></section>
+  </aside>
+
+  <main id="viewport">
+    <canvas id="cv"></canvas>
+    <div id="hud"><span id="coord">x 0 · y 0</span><span id="zoom">100%</span></div>
+    <div id="vtools">
+      <button id="zin" title="Zoom in">+</button><button id="zout" title="Zoom out">−</button><button id="zfit" title="Reset view">⌂</button>
+    </div>
+    <div id="hint"></div>
+  </main>
+
+  <aside id="right">
+    <div class="tabs" id="rtabs">
+      <button data-p="images" class="on">Images</button><button data-p="anims">Animations</button><button data-p="skins">Skins</button><button data-p="events">Events</button>
+    </div>
+    <div class="rpane on scroll" data-p="images">
+      <div class="bar"><button class="stub" data-todo="Import images">Import…</button><button class="stub" data-todo="Atlas">Atlas</button></div>
+      <div class="empty">No images yet.<br>Drag PNG files here to get started.</div>
+    </div>
+    <div class="rpane scroll" data-p="anims">
+      <div class="bar"><button class="stub" data-todo="New animation">+ New</button><button class="stub" data-todo="Duplicate animation">Duplicate</button></div>
+      <ul class="list"><li class="on">animation1<em>4.00 s</em></li><li>idle<em>1.00 s</em></li><li>walk<em>0.80 s</em></li></ul>
+    </div>
+    <div class="rpane scroll" data-p="skins">
+      <div class="bar"><button class="stub" data-todo="New skin">+ New</button></div>
+      <ul class="list"><li class="on">default<em>0 attachments</em></li></ul>
+    </div>
+    <div class="rpane scroll" data-p="events">
+      <div class="bar"><button class="stub" data-todo="New event">+ New</button></div>
+      <div class="empty">No events yet.</div>
+    </div>
+  </aside>
+
+  <section id="timeline">
+    <div id="tlhead">
+      <label class="sel"><select id="animsel"><option>animation1</option><option>idle</option><option>walk</option></select></label>
+      <div class="grp">
+        <button id="tfirst" title="First frame">⏮</button><button id="tprev" title="Previous frame">◀</button>
+        <button id="tplay" title="Play / pause (Space)">▶</button>
+        <button id="tnext" title="Next frame">▶|</button><button id="tlast" title="Last frame">⏭</button>
+      </div>
+      <label class="sel">Frame <input id="tcur" type="number" value="0" min="0"></label>
+      <label class="sel">FPS <input id="tfps" type="number" value="30" min="1"></label>
+      <label class="sel">Duration <input id="tdur" type="number" value="120" min="1"></label>
+      <button id="tkey" title="Set key (K)">◆ Key</button>
+      <button class="stub" data-todo="Auto key">Auto key</button>
+      <button class="stub" data-todo="Loop">Loop</button>
+      <button class="stub" data-todo="Onion skin">Onion</button>
+      <span class="grow"></span>
+      <div class="seg"><button class="on">Dopesheet</button><button class="stub" data-todo="Graph editor">Graph</button></div>
+      <label class="sel">Zoom <input id="tzoom" type="range" min="4" max="30" value="12"></label>
+    </div>
+    <div id="tlbody" class="scroll"></div>
+  </section>
+</div>
+<div id="toast"></div>
+<script src="app.js"></script>
+</body>
+</html>
