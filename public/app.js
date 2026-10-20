@@ -222,7 +222,8 @@ $$('#tools button').forEach(b => b.onclick = () => setTool(b.dataset.tool));
 $$('[data-todo]').forEach(b => b.onclick = () => todo(b.dataset.todo));
 $$('[data-show]').forEach(b => b.onclick = () => { const k = b.dataset.show; S.show[k] = !S.show[k]; b.classList.toggle('on', S.show[k]); draw(); });
 $$('#modes button').forEach(b => b.onclick = () => { S.mode = b.dataset.mode; document.body.className = S.mode; $$('#modes button').forEach(x => x.classList.toggle('on', x === b)); });
-$$('#rtabs button').forEach(b => b.onclick = () => { $$('#rtabs button').forEach(x => x.classList.toggle('on', x === b)); $$('.rpane').forEach(p => p.classList.toggle('on', p.dataset.p === b.dataset.p)); });
+function setRTab(n) { $$('#rtabs button').forEach(x => x.classList.toggle('on', x.dataset.p === n)); $$('.rpane').forEach(p => p.classList.toggle('on', p.dataset.p === n)); }
+$$('#rtabs button').forEach(b => b.onclick = () => { setRTab(b.dataset.p); L.rtab = b.dataset.p; store.set(LK, L); });
 
 const MENUS = {
   File: [['New skeleton', '', newSkeleton], ['Open…', 'Ctrl+O'], ['Save JSON', 'Ctrl+S', saveJson], ['Import data…'], ['Export…', 'Ctrl+E'], ['Pack texture…']],
@@ -230,7 +231,7 @@ const MENUS = {
   Create: [['Bone', 'B', () => setTool('create')], ['Slot'], ['Region attachment'], ['Mesh'], ['IK constraint'], ['Transform constraint'], ['Path constraint']],
   Animate: [['New animation'], ['Set key', 'K', setKey], ['Auto key'], ['Loop'], ['Set speed…']],
   View: [['Reset view', '', resetView], ['Zoom in', '', () => zoomBy(1.25)], ['Zoom out', '', () => zoomBy(.8)], ['Panel layout…']],
-  Window: [['Reset layout'], ['Show atlas'], ['Graph editor']],
+  Window: [['Save layout profile…', '', saveProfile], ['Reset layout', '', () => { profile = 'Default'; store.set(PK2, profile); applyLayout(DEF); fillProfiles(); }], ['Show atlas'], ['Graph editor']],
   Help: [['Keyboard shortcuts'], ['About Randabones']]
 };
 const mw = $('#menus');
@@ -251,7 +252,54 @@ addEventListener('keydown', e => {
   else if (k === 'delete' || k === 'backspace') removeBone(S.sel);
 });
 
+/* ---------- layout: resizable panels + profiles ---------- */
+const DEF = { lw: 250, rw: 230, th: 250, tp: 240, rtab: 'images' };
+const LK = 'randabones.layout', PK = 'randabones.profiles', PK2 = 'randabones.profile';
+const store = { get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { } } };
+let L = { ...DEF, ...store.get(LK, {}) }, profile = store.get(PK2, 'Default');
+const rs = document.documentElement.style;
+function applyLayout(l, save = true) {
+  if (l) L = { ...DEF, ...l };
+  const aw = innerWidth, ah = innerHeight;
+  L.lw = clamp(L.lw, 160, Math.max(160, Math.min(520, aw - L.rw - 320)));
+  L.rw = clamp(L.rw, 160, Math.max(160, Math.min(520, aw - L.lw - 320)));
+  L.th = clamp(L.th, 120, Math.max(120, ah - 72 - 160));
+  L.tp = clamp(L.tp, 70, Math.max(70, ah - 72 - L.th - 130));
+  rs.setProperty('--lw', L.lw + 'px'); rs.setProperty('--rw', L.rw + 'px'); rs.setProperty('--th', L.th + 'px'); rs.setProperty('--tp', L.tp + 'px');
+  setRTab(L.rtab); if (save) store.set(LK, L);
+}
+function dragger(id, key, calc) {
+  const el = $(id);
+  el.addEventListener('pointerdown', e => { e.preventDefault(); el.setPointerCapture(e.pointerId); el.classList.add('drag'); document.body.style.userSelect = 'none'; });
+  el.addEventListener('pointermove', e => { if (!el.classList.contains('drag')) return; L[key] = calc(e, $('#app').getBoundingClientRect()); applyLayout(null, false); });
+  const end = () => { if (!el.classList.contains('drag')) return; el.classList.remove('drag'); document.body.style.userSelect = ''; store.set(LK, L); };
+  el.addEventListener('pointerup', end); el.addEventListener('lostpointercapture', end);
+  el.addEventListener('dblclick', () => { L[key] = DEF[key]; applyLayout(null); });
+}
+dragger('#sp-l', 'lw', (e, a) => e.clientX - a.left);
+dragger('#sp-r', 'rw', (e, a) => a.right - e.clientX);
+dragger('#sp-t', 'th', (e, a) => a.bottom - e.clientY);
+dragger('#sp-lp', 'tp', e => e.clientY - $('#treep').getBoundingClientRect().top);
+const profiles = () => ({ Default: DEF, ...store.get(PK, {}) });
+function fillProfiles() {
+  const s = $('#lprof'), p = profiles(); s.innerHTML = '';
+  Object.keys(p).forEach(n => { const o = document.createElement('option'); o.textContent = n; s.appendChild(o); });
+  if (!p[profile]) profile = 'Default'; s.value = profile; $('#ldel').disabled = profile === 'Default';
+}
+function saveProfile() {
+  const name = (prompt('Layout profile name:', profile === 'Default' ? '' : profile) || '').trim();
+  if (!name) return; if (name === 'Default') return toast('"Default" is reserved');
+  const p = store.get(PK, {}); p[name] = { ...L }; store.set(PK, p); profile = name; store.set(PK2, name); fillProfiles(); toast('Layout profile "' + name + '" saved');
+}
+$('#lsave').onclick = saveProfile;
+$('#ldel').onclick = () => {
+  if (profile === 'Default' || !confirm('Delete layout profile "' + profile + '"?')) return;
+  const p = store.get(PK, {}); delete p[profile]; store.set(PK, p); profile = 'Default'; store.set(PK2, profile); applyLayout(DEF); fillProfiles();
+};
+$('#lprof').onchange = e => { profile = e.target.value; store.set(PK2, profile); applyLayout(profiles()[profile]); fillProfiles(); };
+addEventListener('resize', () => applyLayout(null, false));
+
 function refresh() { drawTree(); syncProps(); drawTimeline(); draw(); }
 new ResizeObserver(resize).observe(cv.parentElement);
-buildProps(); setTool('select'); newSkeleton(); resize();
+fillProfiles(); applyLayout(null); buildProps(); setTool('select'); newSkeleton(); resize();
 })();

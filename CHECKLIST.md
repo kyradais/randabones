@@ -16,6 +16,8 @@ Legend: [x] working · [~] partial · [ ] not working yet (the button/menu is vi
 - [x] Delete a bone with its children (Del)
 - [x] Save skeleton to JSON (File > Save JSON)
 - [x] Menu bar with dropdowns, Setup / Animate mode switch
+- [x] Resizable panels: drag the splitters (left, right, timeline, tree/properties); double-click a splitter to reset it
+- [x] Layout profiles: save / load / delete named layouts (toolbar or Window menu), last layout auto-restored, Window > Reset layout (stored in browser localStorage)
 - [x] Timeline: ruler, playhead, scrubbing, play/pause (Space), frame stepping, FPS, duration, zoom
 - [~] Key: the Key button (K) adds a diamond on the timeline but does **not** store transform values yet
 
@@ -59,6 +61,6 @@ Legend: [x] working · [~] partial · [ ] not working yet (the button/menu is vi
 - [ ] Animation preview in the viewport during playback
 
 ## Not working — Other
-- [ ] Preferences, rebindable keyboard shortcuts, rearrangeable panel layout
+- [ ] Preferences, rebindable keyboard shortcuts, drag-to-dock / floating panels (panels are resizable but fixed in position), export/import layout profiles as files
 - [ ] Project autosave (localStorage / server-side files)
 - [ ] Game runtime players (export for Phaser/Pixi/Godot)

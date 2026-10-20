@@ -42,10 +42,15 @@
     <span class="grow"></span>
     <label class="sel">Skin <select><option>default</option></select></label>
     <label class="sel">Pose <select><option>Setup</option><option>Animation</option></select></label>
+    <i class="sep"></i>
+    <label class="sel">Layout <select id="lprof" title="Layout profile"></select></label>
+    <button id="lsave" title="Save layout profile (Window > Save layout profile)">Save</button>
+    <button id="ldel" title="Delete selected layout profile">Delete</button>
   </div>
 
   <aside id="left">
     <section class="panel" id="treep"><h3>Tree</h3><div id="tree" class="scroll"></div></section>
+    <div class="split h in" id="sp-lp" title="Drag to resize · double-click to reset"></div>
     <section class="panel" id="propsp"><h3>Properties</h3><div id="props" class="scroll"></div></section>
   </aside>
 
@@ -101,6 +106,9 @@
     </div>
     <div id="tlbody" class="scroll"></div>
   </section>
+  <div class="split v" id="sp-l" title="Drag to resize · double-click to reset"></div>
+  <div class="split v" id="sp-r" title="Drag to resize · double-click to reset"></div>
+  <div class="split h" id="sp-t" title="Drag to resize · double-click to reset"></div>
 </div>
 <div id="toast"></div>
 <script src="app.js"></script>
